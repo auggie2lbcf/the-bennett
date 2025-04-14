@@ -22,14 +22,14 @@ const projectsData: Project[] = [
         techStack: ['Next.js', 'React', 'Custom Emails', 'Square API'],
         liveUrl: 'https://itsthevine.com',
     },
-    {
-        id: 2,
-        title: 'Covenant Community Church',
-        description: 'A clean and responsive website for a community church, designed to provide easy access to sermons, events, and contact information. The site emphasizes simplicity and usability to engage visitors effectively.',
-        imageUrl: '/images/covenant.png', 
-        techStack: ['HTML', 'CSS', 'JavaScript', 'Custom Emails'],
-        liveUrl: 'https://covenantcommunity.org',
-    },
+    // {
+    //     id: 2,
+    //     title: 'Covenant Community Church',
+    //     description: 'A clean and responsive website for a community church, designed to provide easy access to sermons, events, and contact information. The site emphasizes simplicity and usability to engage visitors effectively.',
+    //     imageUrl: '/images/covenant.png',
+    //     techStack: ['HTML', 'CSS', 'JavaScript', 'Custom Emails'],
+    //     liveUrl: 'https://covenantcommunity.org',
+    // },
 ];
 
 
