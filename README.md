@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+README.md
+Markdown
+
+# The Bennett - A Windows 95-style Portfolio
+
+This is a personal portfolio website built with Next.js and React, styled to replicate the nostalgic user interface of Windows 95.
+
+### Live Demo
+
+**(Link to your deployed website here)**
+
+## Description
+
+This project serves as a creative portfolio to showcase my web development projects. Instead of a traditional layout, the portfolio is presented as a fully interactive, retro-style desktop environment. Projects can be launched from desktop icons, opening in draggable, minimizable, and maximizable windows that load the live websites within an iframe.
+
+## Features
+
+* **Windows 95 UI:** A faithful recreation of the classic Windows 95 desktop environment, built with modern CSS.
+* **Interactive Desktop:** Draggable windows, a functional taskbar, and a start menu.
+* **Dynamic Windows:** Open, close, minimize, and maximize project windows. The state is managed with React hooks.
+* **Project Showcase:** Desktop icons launch modals that iframe live project websites.
+* **Fun Extras:** Includes a bouncing logo screensaver and a fake "Blue Screen of Death" for added nostalgia.
+* **Konami Code:** An easter egg triggered by the Konami code.
+
+## Tech Stack
+
+* **Framework:** [Next.js](https://nextjs.org/)
+* **Library:** [React](https://reactjs.org/)
+* **Language:** [TypeScript](https://www.typescriptlang.org/)
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/) (via `globals.css` with custom styles)
 
 ## Getting Started
 
-First, run the development server:
+First, install the dependencies:
 
 ```bash
+npm install
+Then, run the development server:
+
+Bash
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Open http://localhost:3000 with your browser to see the result.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Project Structure
+/app: The main application routing and layout files for Next.js.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+/components: Contains all the React components for the UI, such as Desktop.tsx, Taskbar.tsx, and Win95Window.tsx.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+/hooks: Custom React hooks for managing UI state (useUIState.ts) and window dragging (useDrag.ts).
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+/public: Static assets, including all the pixel-art icons used throughout the application.
