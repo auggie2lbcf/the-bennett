@@ -7,7 +7,7 @@ This is a personal portfolio website built with Next.js and React, styled to rep
 
 ### Live Demo
 
-**(Link to your deployed website here)**
+https://thebennett.net
 
 ## Description
 
