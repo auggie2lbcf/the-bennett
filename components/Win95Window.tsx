@@ -108,7 +108,8 @@ export function Win95Window({ id, title, icon, url, children, initial, onClose }
     if (project && project.maximized) {
       prev.current = { x: pos.x, y: pos.y, w: size.w, h: size.h };
       setPos({ x: 0, y: 0 });
-      setSize({ w: window.innerWidth, h: window.innerHeight - 36 });
+      // reserve 36px at the bottom for the taskbar so it remains visible
+      setSize({ w: window.innerWidth, h: Math.max(0, window.innerHeight - 36) });
     } else if (project && project.left !== undefined && project.top !== undefined) {
       // sync to project geometry when it changes externally
       setPos({ x: project.left ?? pos.x, y: project.top ?? pos.y });
@@ -158,8 +159,10 @@ export function Win95Window({ id, title, icon, url, children, initial, onClose }
         left: pos.x,
         top: pos.y,
         width: size.w,
+        // never allow a maximized window to exceed available area (taskbar reserved)
         height: minimized ? 34 : size.h,
-        zIndex: project?.zIndex ?? (100 + (project && project.maximized ? 999 : 0)),
+        // ensure zIndex comes from store; don't artificially inflate maximized windows above the taskbar
+        zIndex: project?.zIndex ?? 100,
         display: "flex",
         flexDirection: "column",
       }}
@@ -220,7 +223,8 @@ function handleStyle(cursor: string, left: number | string, top: number | string
     height: typeof top === 'number' ? top : defaultSize,
     cursor,
     background: 'transparent',
-    zIndex: 9999,
+    // make handles sit under the taskbar by default
+    zIndex: 200,
     touchAction: 'none',
   };
   if (rightSide) style.right = -half + 8; else style.left = typeof left === 'number' ? -half + 8 : `calc(${left} - ${half}px)`;

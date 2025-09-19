@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "My Win95 Portfolio",
+    title: "Bennett Portfolio",
     description: "A Windows 95–style portfolio showcasing my web projects",
 };
 

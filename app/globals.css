@@ -265,6 +265,34 @@ body {
   padding: 4px 8px;
 }
 
+/* Win95-style fixed task button */
+.task-button {
+  width: 140px; /* fixed width similar to old Win95 */
+  height: 28px;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+.task-button .task-button-label {
+  flex: 1 1 auto;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.task-button .task-button-inner {
+  width: 100%;
+}
+.task-button.pressed {
+  /* pressed look when active */
+  box-shadow:
+    inset 1px 1px 0 var(--win95-edge-dark),
+    inset -1px -1px 0 var(--win95-edge-light);
+  background: linear-gradient(to bottom, #b8b8b8, #a0a0a0);
+}
+
 .taskbar .task-buttons .win95-button span {
   color: #000;
 }

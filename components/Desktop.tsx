@@ -43,14 +43,19 @@ export function Desktop() {
                         key={p.id}
                         className="desktop-icon"
                         onClick={() => handleIconClick(p.id, {title: p.title, icon: p.icon, url: p.url, openInNewTab: p.openInNewTab})}
-                        onDoubleClick={(e: React.MouseEvent) => {
-                            // Open in a new browser tab if the project prefers it, or user held a modifier / middle-click
-                            if (p.url && (p.openInNewTab || e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)) {
-                                window.open(p.url, "_blank");
-                                return;
-                            }
-                            openProject(p.id, { title: p.title, icon: p.icon, url: p.url });
-                        }}
+                                onDoubleClick={(e: React.MouseEvent) => {
+                                    // If the project explicitly prefers to open in a new tab, do that and don't open a window
+                                    if (p.url && p.openInNewTab) {
+                                        window.open(p.url, "_blank");
+                                        return;
+                                    }
+                                    // Otherwise allow modifier keys / middle-click to force a new tab
+                                    if (p.url && (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)) {
+                                        window.open(p.url, "_blank");
+                                        return;
+                                    }
+                                    openProject(p.id, { title: p.title, icon: p.icon, url: p.url });
+                                }}
                         style={{
                             background: "transparent",
                             border: "none",

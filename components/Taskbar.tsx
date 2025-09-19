@@ -102,25 +102,21 @@ export function Taskbar() {
         />
       )}
 
-      <div className="task-buttons" style={{ display: "flex", gap: 6, flex: 1 }}>
+      <div className="task-buttons" style={{ display: "flex", gap: 6, flex: 1, alignItems: 'center' }}>
         {runningButtons.map((b) => (
           <button
             key={b.id}
-            className="win95-button"
+            className={`task-button win95-button ${b.minimized ? '' : 'pressed'}`}
             onClick={b.onClick}
-            style={{
-              minWidth: 120,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              background: b.minimized ? "#DFDFDF" : "#EAEAEA",
-            }}
             aria-pressed={!b.minimized}
+            title={b.title}
           >
+            <div className="task-button-inner" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Win95Icon name={b.icon} />
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span className="task-button-label" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {b.title}
               </span>
+            </div>
           </button>
         ))}
       </div>
