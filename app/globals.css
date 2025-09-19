@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --- Windows 95 look & feel --- */
+:root {
+  --win95-face: #C0C0C0;
+  --win95-edge-light: #FFFFFF;
+  --win95-edge-dark: #808080;
+  --win95-shadow: #000000;
+  --win95-accent: #000080; /* dark blue title bar */
+  --win95-accent-light: #1084d0;
+}
+
+.win95-window {
+  background: var(--win95-face);
+  border: 2px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light),
+    2px 2px 0 rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.win95-window.maximized {
+  border-width: 0;
+  box-shadow: none;
+}
+
+.title-bar {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  color: #fff;
+  background: linear-gradient(to right, var(--win95-accent) 0%, var(--win95-accent-light) 100%);
+  user-select: none;
+  cursor: move;
+}
+
+.title-bar-text {
+  font-weight: 700;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 13px;
+}
+
+.title-bar-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.title-bar-controls button {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light);
+  background: var(--win95-face);
+  padding: 0;
+  cursor: default;
+  position: relative;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  color: #000;
+}
+.title-bar-controls button:active {
+  box-shadow:
+    inset 1px 1px 0 var(--win95-edge-dark),
+    inset -1px -1px 0 var(--win95-edge-light);
+}
+/* Win95 control glyphs */
+.title-bar-controls button::before {
+  content: "";
+  font-family: "MS Sans Serif", Tahoma, sans-serif;
+  font-size: 12px;
+  transform: translateY(-1px);
+}
+.title-bar-controls button[aria-label="Minimize"]::before {
+  /* underscore-like */
+  content: " ";
+}
+.title-bar-controls button[aria-label="Maximize"]::before {
+  /* square outline */
+  content: "▢";
+  font-size: 11px;
+}
+.title-bar-controls button[aria-label="Restore"]::before {
+  /* two overlapping squares approximation */
+  content: "▣";
+  font-size: 11px;
+}
+.title-bar-controls button[aria-label="Close"]::before {
+  /* multiplication sign */
+  content: "×";
+  font-size: 13px;
+}
+
+/* Generic button */
+.win95-button {
+  border: 2px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light);
+  background: var(--win95-face);
+  padding: 2px 8px;
+  cursor: default;
+}
+.win95-button:active {
+  box-shadow:
+    inset 1px 1px 0 var(--win95-edge-dark),
+    inset -1px -1px 0 var(--win95-edge-light);
+}
+
+/* Start button */
+.win95-start {
+  border: 2px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light);
+  background: var(--win95-face);
+}
+.win95-start:active {
+  box-shadow:
+    inset 1px 1px 0 var(--win95-edge-dark),
+    inset -1px -1px 0 var(--win95-edge-light);
+}
+
+/* Window content */
+.window-body {
+  background: var(--win95-face);
+  color: #000;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 13px;
+}
+
+/* Tray popup and calendar grid (used by popup/calendar) */
+.win95-tray-popup {
+  background: var(--win95-face);
+  border: 2px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light),
+    2px 2px 0 rgba(0,0,0,0.2);
+  padding: 6px;
+}
+
+.win95-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.win95-cal .d {
+  min-width: 22px;
+  min-height: 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light);
+  font-size: 12px;
+}
+.win95-cal .hdr {
+  background: #d7d7d7;
+  font-weight: 700;
+}
+
+/* Taskbar baseline (already present inline, these help normalize) */
+.taskbar {
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 12px;
+}
