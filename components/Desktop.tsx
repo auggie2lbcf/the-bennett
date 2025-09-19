@@ -1,7 +1,7 @@
 // components/Desktop.tsx
 "use client";
 import React, {useRef} from "react";
-import {Win95Icon} from "@/components/Win95Icons";
+import {Win95Icon, IconName} from "@/components/Win95Icons";
 import {useUIState} from "@/hooks/useUIState";
 import {ProjectWindow} from "@/components/ProjectWindow";
 
@@ -13,9 +13,9 @@ const PROJECTS: Array<{ id: string; title: string; icon: "folder" | "notepad" | 
 
 export function Desktop() {
     const {projects, openProject} = useUIState();
-    const clickTimers = useRef<Record<string, any>>({});
+    const clickTimers = useRef<Record<string, number | null>>({});
 
-    const handleIconClick = (pid: string, meta: { title: string; icon: string; url: string }) => {
+    const handleIconClick = (pid: string, meta: { title: string; icon: IconName; url: string }) => {
         const t = clickTimers.current[pid];
         if (t) {
             clearTimeout(t);
@@ -23,10 +23,13 @@ export function Desktop() {
             openProject(pid, meta);
             return;
         }
-        clickTimers.current[pid] = setTimeout(() => {
-            clearTimeout(clickTimers.current[pid]);
-            clickTimers.current[pid] = null;
+        const id = window.setTimeout(() => {
+            if (clickTimers.current[pid]) {
+                clearTimeout(clickTimers.current[pid] as number);
+                clickTimers.current[pid] = null;
+            }
         }, 250);
+        clickTimers.current[pid] = id;
     };
 
     return (

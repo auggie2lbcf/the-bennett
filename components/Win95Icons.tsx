@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 
-type IconName =
+export type IconName =
     | "computer"
     | "folder"
     | "file"

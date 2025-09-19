@@ -1,11 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
+import type { IconName } from "@/components/Win95Icons";
 
 type ProjectWindowState = {
     id: string;
     title: string;
-    icon: string;          // key from Win95Icons
+    icon: IconName;          // key from Win95Icons
     visible: boolean;
     minimized: boolean;
     maximized: boolean;
@@ -47,7 +48,7 @@ type UIState = {
     volume: number;
     setVolume: (v: number) => void;
     muted: boolean;
-    setMuted: Setter<boolean>;
+    setMuted: React.Dispatch<React.SetStateAction<boolean>>;
 
     // projects (desktop apps)
     projects: ProjectWindowState[];
@@ -120,11 +121,11 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const setVolume = (v: number) => {
+    const setVolume = useCallback((v: number) => {
         _setVolume(v);
         if (v === 0) setMuted(true);
         else if (muted) setMuted(false);
-    };
+    }, [muted]);
 
     // project actions
     const openProject: UIState["openProject"] = (id, meta) => {
@@ -219,7 +220,7 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
     }), [
         mainVisible, mainMinimized, mainMaximized, aboutVisible,
         screensaverOn, bsodOn, startOpen, calendarOpen, volumeOpen,
-        time, online, volume, muted, projects
+        time, online, volume, muted, projects, setVolume
     ]);
 
     return React.createElement(Ctx.Provider, { value }, children);

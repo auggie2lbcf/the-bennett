@@ -1,7 +1,7 @@
 // components/Taskbar.tsx
 "use client";
 import React, { useCallback, useMemo, useState } from "react";
-import { Win95Icon } from "@/components/Win95Icons";
+import { Win95Icon, IconName } from "@/components/Win95Icons";
 import { useUIState } from "@/hooks/useUIState";
 import { CalendarPopup } from "@/components/CalendarPopup";
 
@@ -24,12 +24,12 @@ export function Taskbar() {
     calendarOpen, setCalendarOpen,
     volumeOpen, setVolumeOpen,
     projects, toggleProjectMinimize, bringProjectToFront,
-    mainVisible, mainMinimized, toggleMainMinimized,
+    mainMinimized, toggleMainMinimized,
     aboutVisible, toggleAboutVisible
   } = useUIState();
 
   const runningButtons = useMemo(() => {
-    const items: Array<{ id: string; title: string; minimized: boolean; icon: any; onClick: () => void }> = [];
+    const items: Array<{ id: string; title: string; minimized: boolean; icon: IconName; onClick: () => void }> = [];
 
     items.push({
       id: "main",
@@ -60,7 +60,7 @@ export function Taskbar() {
     return items;
   }, [projects, mainMinimized, aboutVisible, bringProjectToFront, toggleProjectMinimize, toggleMainMinimized, toggleAboutVisible]);
 
-  const [trayHover, setTrayHover] = useState(false);
+  const [, setTrayHover] = useState(false);
 
   const onSelectDate = useCallback((date: Date) => {
     const url = buildGoogleCalendarCreateUrl(date);

@@ -1,24 +1,26 @@
 // components/ProjectWindow.tsx
 "use client";
 import React, { useMemo, useRef } from "react";
-import { Win95Icon } from "./Win95Icons";
+import { Win95Icon, IconName } from "./Win95Icons";
 import { useUIState } from "@/hooks/useUIState";
 import { useDrag } from "@/hooks/useDrag";
 
 export function ProjectWindow({ id, children }: { id: string; children: React.ReactNode }) {
     const { projects, toggleProjectMinimize, toggleProjectMaximize, closeProject, bringProjectToFront } = useUIState();
-    const win = projects.find((p) => p.id === id);
-    if (!win || !win.visible || win.minimized) return null;
+    const win = projects.find((p) => p.id === id) ?? null;
 
     // Stable initial offset per window, so they don't stack perfectly
     const index = projects.findIndex((p) => p.id === id);
     const initial = useMemo(() => ({ x: 120 + index * 24, y: 96 + index * 24 }), [index]);
 
-    // Allow dragging only when not maximized
-    const { pos, setPos, onMouseDown } = useDrag(!win.maximized, initial);
+    // Allow dragging only when not maximized (safe even if win is null)
+    const dragEnabled = !(win?.maximized ?? false);
+    const { pos, setPos, onMouseDown } = useDrag(dragEnabled, initial);
 
     // Remember previous geometry for restore after maximize
     const prevRect = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
+
+    if (!win || !win.visible || win.minimized) return null;
 
     const onTitlebarDoubleClick = () => {
         if (!win.maximized) {
@@ -61,7 +63,7 @@ export function ProjectWindow({ id, children }: { id: string; children: React.Re
                 aria-label={`${win.title} window title bar`}
             >
                 <div className="title-bar-text" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <Win95Icon name={win.icon as any} />
+                    <Win95Icon name={win.icon as IconName} />
                     {win.title}
                 </div>
                 <div className="title-bar-controls">

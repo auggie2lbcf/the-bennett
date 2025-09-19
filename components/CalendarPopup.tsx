@@ -10,18 +10,18 @@ export function CalendarPopup({ onClose, onSelectDate }: { onClose: () => void; 
     const [refDate, setRefDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
-    const { year, month, startDay, cells } = useMemo(() => {
+    const { year, month, cells } = useMemo(() => {
         const year = refDate.getFullYear();
         const month = refDate.getMonth();
         const first = new Date(year, month, 1);
-        const startDay = (first.getDay() + 6) % 7; // Monday=0
+        // compute startDay implicitly via leading nulls in cells
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const cells: (number | null)[] = [
-            ...Array(startDay).fill(null),
+            ...Array((first.getDay() + 6) % 7).fill(null),
             ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
         ];
         while (cells.length % 7 !== 0) cells.push(null);
-        return { year, month, startDay, cells };
+    return { year, month, cells };
     }, [refDate]);
 
     return (
