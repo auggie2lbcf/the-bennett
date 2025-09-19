@@ -2,15 +2,13 @@
 
 :root {
     --background: #ffffff;
-    --foreground: #171717;
+  --foreground: #171717;
+  --win95-text: #000000; /* primary UI text */
+  --win95-text-muted: #808080; /* disabled / secondary */
+  --win95-text-inverse: #ffffff; /* used on dark titlebars */
 }
 
-@theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
-}
+/* theme variables intentionally omitted; using root vars instead */
 
 @media (prefers-color-scheme: dark) {
     :root {
@@ -20,9 +18,13 @@
 }
 
 body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  color: var(--win95-text);
+  /* more readable system font stack */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* increase base size for readability */
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* --- Windows 95 look & feel --- */
@@ -51,7 +53,7 @@ body {
 }
 
 .title-bar {
-  height: 28px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -65,7 +67,8 @@ body {
 .title-bar-text {
   font-weight: 700;
   font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
+  color: var(--win95-text-inverse);
 }
 
 .title-bar-controls {
@@ -154,9 +157,23 @@ body {
 /* Window content */
 .window-body {
   background: var(--win95-face);
-  color: #000;
+  color: var(--win95-text);
   font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 12px;
+}
+
+/* Typography inside window content for better readability */
+.window-body h1,
+.window-body h2,
+.window-body h3,
+.window-body h4 {
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+.window-body p {
+  margin: 0 0 0.8rem 0;
 }
 
 /* Tray popup and calendar grid (used by popup/calendar) */
@@ -176,15 +193,15 @@ body {
   gap: 2px;
 }
 .win95-cal .d {
-  min-width: 22px;
-  min-height: 20px;
+  min-width: 26px;
+  min-height: 24px;
   display: grid;
   place-items: center;
   border: 1px solid var(--win95-edge-dark);
   box-shadow:
     inset -1px -1px 0 var(--win95-edge-dark),
     inset 1px 1px 0 var(--win95-edge-light);
-  font-size: 12px;
+  font-size: 13px;
 }
 .win95-cal .hdr {
   background: #d7d7d7;
@@ -194,5 +211,130 @@ body {
 /* Taskbar baseline (already present inline, these help normalize) */
 .taskbar {
   font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 13px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--win95-face);
+  /* classic beveled edges: light on top, dark on bottom */
+  border-top: 2px solid var(--win95-edge-light);
+  border-bottom: 2px solid var(--win95-edge-dark);
+  z-index: 9999;
+}
+
+.taskbar {
+  color: var(--win95-text);
+}
+
+/* Taskbar areas */
+.taskbar .start-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+}
+
+/* pressed/active look for Start and task buttons */
+.start-button.pressed,
+.win95-button.pressed {
+  /* invert bevel to look pressed */
+  box-shadow:
+    inset 1px 1px 0 var(--win95-edge-dark),
+    inset -1px -1px 0 var(--win95-edge-light);
+  background: linear-gradient(to bottom, #b8b8b8, #a0a0a0);
+}
+
+.taskbar .task-buttons {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.taskbar .task-buttons .win95-button {
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #EAEAEA;
+  padding: 4px 8px;
+}
+
+.taskbar .task-buttons .win95-button span {
+  color: #000;
+}
+
+.system-tray {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.taskbar .clock {
+  font-family: "MS Sans Serif", Tahoma, sans-serif;
   font-size: 12px;
+  padding: 4px 8px;
+  border: 2px solid var(--win95-edge-dark);
+  background: var(--win95-face);
+  color: var(--win95-text);
+}
+
+/* Make desktop icon labels more readable */
+.desktop-icon {
+  color: var(--win95-text);
+  font-size: 13px;
+  text-shadow: none;
+}
+
+/* desktop-specific: white labels with dark shadow over colorful background */
+.desktop .desktop-icon {
+  color: var(--win95-text-inverse);
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Start menu styles */
+.start-menu {
+  width: 320px;
+  display: flex;
+  background: var(--win95-face);
+  border: 2px solid var(--win95-edge-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win95-edge-dark),
+    inset 1px 1px 0 var(--win95-edge-light);
+}
+.start-menu .left {
+  width: 220px;
+  border-right: 2px solid var(--win95-edge-dark);
+}
+.start-menu .right {
+  flex: 1;
+  padding: 8px;
+  background: linear-gradient(to bottom, #e8e8e8, #dcdcdc);
+}
+.win95-list-item {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+  font-family: "MS Sans Serif", Tahoma, sans-serif;
+  color: var(--win95-text);
+}
+.win95-list-item:hover {
+  background: #000080;
+  color: #fff;
+}
+.win95-list-item.focused {
+  background: #000080;
+  color: #fff;
+}
+.win95-list-item .icon {
+  width: 18px;
+  height: 18px;
 }

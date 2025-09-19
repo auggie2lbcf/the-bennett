@@ -1,16 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
-import type { IconName } from "@/components/Win95Icons";
+import type { AnyIconName } from "@/components/Win95Icons";
 
 type ProjectWindowState = {
     id: string;
     title: string;
-    icon: IconName;          // key from Win95Icons
+    icon: AnyIconName;          // key from Win95Icons (includes legacy aliases)
     visible: boolean;
-    minimized: boolean;
-    maximized: boolean;
     url?: string;          // external app URL to embed
+    minimized?: boolean;
+    maximized?: boolean;
+    left?: number;
+    top?: number;
+    width?: number;
+    height?: number;
+    zIndex?: number;
 };
 
 type UIState = {
@@ -25,6 +30,10 @@ type UIState = {
     // about window
     aboutVisible: boolean;
     setAboutVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    aboutMinimized: boolean;
+    setAboutMinimized: React.Dispatch<React.SetStateAction<boolean>>;
+    aboutMaximized: boolean;
+    setAboutMaximized: React.Dispatch<React.SetStateAction<boolean>>;
 
     // overlays
     screensaverOn: boolean;
@@ -54,8 +63,9 @@ type UIState = {
     projects: ProjectWindowState[];
     openProject: (id: string, meta?: Partial<Pick<ProjectWindowState, "title" | "icon" | "url">>) => void;
     closeProject: (id: string) => void;
-    toggleProjectMinimize: (id: string) => void;
-    toggleProjectMaximize: (id: string) => void;
+    setProjectMinimized: (id: string, v: boolean) => void;
+    toggleProjectMaximized: (id: string) => void;
+    updateProjectGeometry: (id: string, geom: Partial<Pick<ProjectWindowState, "left" | "top" | "width" | "height">>) => void;
     bringProjectToFront: (id: string) => void;
 
     // actions (derived)
@@ -65,6 +75,8 @@ type UIState = {
     triggerBSOD: () => void;
     shutdownAll: () => void;
     toggleMainMinimized: () => void;
+    toggleAboutMinimized: () => void;
+    toggleAboutMaximized: () => void;
     toggleAboutVisible: () => void;
 };
 
@@ -72,12 +84,15 @@ const Ctx = createContext<UIState | null>(null);
 
 export function UIStateProvider({ children }: { children: React.ReactNode }) {
     // main window
-    const [mainVisible, setMainVisible] = useState(true);
+    // hide the main window by default — show it only when explicitly opened
+    const [mainVisible, setMainVisible] = useState(false);
     const [mainMinimized, setMainMinimized] = useState(false);
     const [mainMaximized, setMainMaximized] = useState(false);
 
     // about window
     const [aboutVisible, setAboutVisible] = useState(false);
+    const [aboutMinimized, setAboutMinimized] = useState(false);
+    const [aboutMaximized, setAboutMaximized] = useState(false);
 
     // overlays
     const [screensaverOn, setScreensaverOn] = useState(false);
@@ -98,6 +113,7 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
 
     // projects
     const [projects, setProjects] = useState<ProjectWindowState[]>([]);
+    const [, setZCounter] = useState(100);
 
     // effects
     useEffect(() => {
@@ -128,54 +144,63 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
     }, [muted]);
 
     // project actions
-    const openProject: UIState["openProject"] = (id, meta) => {
-        setProjects((cur) => {
-            const exists = cur.find((p) => p.id === id);
-            if (exists) {
-                return cur.map((p) =>
-                    p.id === id ? { ...p, visible: true, minimized: false, url: meta?.url ?? p.url } : p
-                );
-            }
-            return [
-                ...cur,
-                {
-                    id,
-                    title: meta?.title ?? id,
-                    icon: meta?.icon ?? "folder",
-                    visible: true,
-                    minimized: false,
-                    maximized: false,
-                    url: meta?.url,
-                },
-            ];
+    const openProject: UIState["openProject"] = useCallback((id, meta) => {
+        setZCounter((prevZ) => {
+            const newZ = prevZ + 1;
+            setProjects((cur) => {
+                const exists = cur.find((p) => p.id === id);
+                if (exists) {
+                    return cur.map((p) =>
+                        p.id === id ? { ...p, visible: true, minimized: false, maximized: false, url: meta?.url ?? p.url, zIndex: Math.max(p.zIndex ?? 0, newZ) } : p
+                    );
+                }
+                return [
+                    ...cur,
+                    {
+                        id,
+                        title: meta?.title ?? id,
+                        icon: meta?.icon ?? "folder",
+                        visible: true,
+                        minimized: false,
+                        maximized: false,
+                        url: meta?.url,
+                        left: 120,
+                        top: 96,
+                        width: 760,
+                        height: 480,
+                        zIndex: newZ,
+                    },
+                ];
+            });
+            return newZ;
         });
-    };
+    }, []);
 
-    const closeProject: UIState["closeProject"] = (id) => {
+    const closeProject: UIState["closeProject"] = useCallback((id) => {
         setProjects((cur) => cur.filter((p) => p.id !== id));
-    };
+    }, []);
 
-    const toggleProjectMinimize: UIState["toggleProjectMinimize"] = (id) => {
-        setProjects((cur) =>
-            cur.map((p) => (p.id === id ? { ...p, minimized: !p.minimized, visible: !p.minimized || p.visible } : p))
-        );
-    };
+    const setProjectMinimized = useCallback((id: string, v: boolean) => {
+        setProjects((cur) => cur.map((p) => (p.id === id ? { ...p, minimized: v, visible: true } : p)));
+    }, []);
 
-    const toggleProjectMaximize: UIState["toggleProjectMaximize"] = (id) => {
-        setProjects((cur) => cur.map((p) => (p.id === id ? { ...p, maximized: !p.maximized } : p)));
-    };
+    const toggleProjectMaximized = useCallback((id: string) => {
+        setProjects((cur) => cur.map((p) => (p.id === id ? { ...p, maximized: !p.maximized, minimized: false } : p)));
+    }, []);
 
-    const bringProjectToFront: UIState["bringProjectToFront"] = (id) => {
-        // naive: reorder so the clicked project is last (on top)
-        setProjects((cur) => {
-            const idx = cur.findIndex((p) => p.id === id);
-            if (idx === -1) return cur;
-            const copy = [...cur];
-            const [item] = copy.splice(idx, 1);
-            copy.push({ ...item, visible: true, minimized: false });
-            return copy;
+    const updateProjectGeometry = useCallback((id: string, geom: Partial<Pick<ProjectWindowState, "left" | "top" | "width" | "height">>) => {
+        setProjects((cur) => cur.map((p) => (p.id === id ? { ...p, ...geom } : p)));
+    }, []);
+
+    const bringProjectToFront = useCallback((id: string) => {
+        setZCounter((prevZ) => {
+            const newZ = prevZ + 1;
+            setProjects((cur) => cur.map((p) => (p.id === id ? { ...p, zIndex: newZ } : p)));
+            return newZ;
         });
-    };
+    }, []);
+
+    // simplified project controls - open/close only
 
     const value = useMemo<UIState>(() => ({
         mainVisible, setMainVisible,
@@ -183,6 +208,8 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
         mainMaximized, setMainMaximized,
 
         aboutVisible, setAboutVisible,
+    aboutMinimized, setAboutMinimized,
+    aboutMaximized, setAboutMaximized,
 
         screensaverOn, setScreensaverOn,
         bsodOn, setBsodOn,
@@ -196,18 +223,21 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
         volume, setVolume,
         muted, setMuted,
 
-        projects,
-        openProject,
-        closeProject,
-        toggleProjectMinimize,
-        toggleProjectMaximize,
-        bringProjectToFront,
+    projects,
+    openProject,
+    closeProject,
+    setProjectMinimized,
+    toggleProjectMaximized,
+    updateProjectGeometry,
+    bringProjectToFront,
 
         ensurePortfolioShown: () => {
             if (!mainVisible) setMainVisible(true);
             setMainMinimized(false);
         },
         openAbout: () => setAboutVisible(true),
+        toggleAboutMinimized: () => setAboutMinimized((m) => !m),
+        toggleAboutMaximized: () => setAboutMaximized((m) => !m),
         startScreensaver: () => setScreensaverOn(true),
         triggerBSOD: () => setBsodOn(true),
         shutdownAll: () => {
@@ -218,9 +248,9 @@ export function UIStateProvider({ children }: { children: React.ReactNode }) {
         toggleMainMinimized: () => setMainMinimized((m) => !m),
         toggleAboutVisible: () => setAboutVisible((v) => !v),
     }), [
-        mainVisible, mainMinimized, mainMaximized, aboutVisible,
+        mainVisible, mainMinimized, mainMaximized, aboutVisible, aboutMinimized, aboutMaximized,
         screensaverOn, bsodOn, startOpen, calendarOpen, volumeOpen,
-        time, online, volume, muted, projects, setVolume
+        time, online, volume, muted, projects, setVolume, bringProjectToFront, openProject, closeProject, setProjectMinimized, toggleProjectMaximized, updateProjectGeometry
     ]);
 
     return React.createElement(Ctx.Provider, { value }, children);

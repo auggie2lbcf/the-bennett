@@ -4,6 +4,8 @@ import React from "react";
 import {UIStateProvider} from "@/hooks/useUIState";
 import {Desktop} from "@/components/Desktop";
 import {Taskbar} from "@/components/Taskbar";
+import Screensaver from "@/components/Screensaver";
+import BSOD from "@/components/BSOD";
 
 export default function Home() {
     return (
@@ -12,6 +14,8 @@ export default function Home() {
                 <Desktop/>
             </div>
             <Taskbar/>
+            <Screensaver />
+            <BSOD />
         </UIStateProvider>
     );
 }

@@ -1,7 +1,8 @@
 // components/Taskbar.tsx
 "use client";
 import React, { useCallback, useMemo, useState } from "react";
-import { Win95Icon, IconName } from "@/components/Win95Icons";
+import { Win95Icon, AnyIconName } from "@/components/Win95Icons";
+import { StartMenu } from "@/components/StartMenu";
 import { useUIState } from "@/hooks/useUIState";
 import { CalendarPopup } from "@/components/CalendarPopup";
 
@@ -23,42 +24,54 @@ export function Taskbar() {
     startOpen, setStartOpen,
     calendarOpen, setCalendarOpen,
     volumeOpen, setVolumeOpen,
-    projects, toggleProjectMinimize, bringProjectToFront,
-    mainMinimized, toggleMainMinimized,
-    aboutVisible, toggleAboutVisible
+    projects, setProjectMinimized,
+    mainVisible, mainMinimized, toggleMainMinimized,
+    aboutVisible, toggleAboutVisible,
+    openAbout, startScreensaver, triggerBSOD, shutdownAll
   } = useUIState();
 
   const runningButtons = useMemo(() => {
-    const items: Array<{ id: string; title: string; minimized: boolean; icon: IconName; onClick: () => void }> = [];
+  const items: Array<{ id: string; title: string; minimized: boolean; icon: AnyIconName; onClick: () => void }> = [];
 
-    items.push({
-      id: "main",
-      title: "Main",
-      minimized: mainMinimized,
-      icon: "computer",
-      onClick: toggleMainMinimized,
-    });
-
-    items.push({
-      id: "about",
-      title: "About",
-      minimized: !aboutVisible,
-      icon: "file",
-      onClick: toggleAboutVisible,
-    });
+    // only show main/about if their windows are visible
+    if (mainVisible) {
+      items.push({
+        id: "main",
+        title: "Main",
+        minimized: mainMinimized,
+        icon: "computer",
+        onClick: toggleMainMinimized,
+      });
+    }
+    if (aboutVisible) {
+      items.push({
+        id: "about",
+        title: "About",
+        minimized: !aboutVisible,
+        icon: "file",
+        onClick: toggleAboutVisible,
+      });
+    }
 
     projects.forEach((p) => {
       items.push({
         id: p.id,
         title: p.title,
-        minimized: p.minimized,
+        minimized: !!p.minimized,
         icon: p.icon,
-        onClick: () => (p.minimized ? bringProjectToFront(p.id) : toggleProjectMinimize(p.id)),
+        onClick: () => {
+          // toggle minimize/restore when clicking the taskbar button
+          if (p.minimized) {
+            setProjectMinimized(p.id, false);
+          } else {
+            setProjectMinimized(p.id, true);
+          }
+        },
       });
     });
 
     return items;
-  }, [projects, mainMinimized, aboutVisible, bringProjectToFront, toggleProjectMinimize, toggleMainMinimized, toggleAboutVisible]);
+  }, [projects, mainMinimized, aboutVisible, mainVisible, toggleMainMinimized, toggleAboutVisible, setProjectMinimized]);
 
   const [, setTrayHover] = useState(false);
 
@@ -70,14 +83,24 @@ export function Taskbar() {
   return (
     <div className="taskbar" style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: 36, background: "#C0C0C0", borderTop: "2px solid #fff", display: "flex", alignItems: "center", gap: 6, padding: "4px 6px", zIndex: 9999 }}>
       <button
-        className="start-button win95-start"
+        className={`start-button win95-start ${startOpen ? "pressed" : ""}`}
         onClick={() => setStartOpen((v) => !v)}
         aria-expanded={startOpen}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px" }}
       >
         <Win95Icon name="start" />
         Start
       </button>
+
+      {startOpen && (
+        <StartMenu
+          id="start-menu"
+          onClose={() => setStartOpen(false)}
+          onOpenAbout={() => { setStartOpen(false); openAbout(); }}
+          onStartScreensaver={() => { setStartOpen(false); startScreensaver(); }}
+          onStartBSOD={() => { setStartOpen(false); triggerBSOD(); }}
+          onShutdown={() => { setStartOpen(false); shutdownAll(); }}
+        />
+      )}
 
       <div className="task-buttons" style={{ display: "flex", gap: 6, flex: 1 }}>
         {runningButtons.map((b) => (
@@ -94,10 +117,10 @@ export function Taskbar() {
             }}
             aria-pressed={!b.minimized}
           >
-            <Win95Icon name={b.icon} />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {b.title}
-            </span>
+              <Win95Icon name={b.icon} />
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {b.title}
+              </span>
           </button>
         ))}
       </div>
@@ -109,7 +132,7 @@ export function Taskbar() {
         style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}
       >
         <button
-          className="win95-button"
+          className={`win95-button ${volumeOpen ? "pressed" : ""}`}
           onClick={() => setVolumeOpen((v) => !v)}
           aria-label="Volume"
           aria-expanded={volumeOpen}
@@ -118,14 +141,14 @@ export function Taskbar() {
         </button>
 
         <button
-          className="win95-button"
+          className={`win95-button ${calendarOpen ? "pressed" : ""}`}
           onClick={() => setCalendarOpen((v) => !v)}
           aria-label="Calendar"
           aria-expanded={calendarOpen}
           style={{ display: "flex", alignItems: "center", gap: 6 }}
         >
           <Win95Icon name="calendar" />
-          <span style={{ minWidth: 52, textAlign: "right" }}>{time || "--:--"}</span>
+          <span className="clock">{time || "--:--"}</span>
         </button>
 
         {calendarOpen && (

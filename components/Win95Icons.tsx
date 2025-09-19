@@ -1,97 +1,167 @@
-// components/Win95Icons.tsx
+// components/Win95Icons.tsx — simplified icon loader that uses PNG assets from /public/icons_1024x1024
 "use client";
 import React from "react";
+import Image from "next/image";
 
 export type IconName =
+    | "three_d_graphics_file"
+    | "three_d_graphics_program"
+    | "aseprite_file"
+    | "aseprite"
+    | "audio_editor"
+    | "audio_file"
+    | "audio_music_file"
+    | "briefcase"
+    | "calculator"
+    | "calendar"
+    | "camera"
+    | "cd_drive"
+    | "chrome"
+    | "clock"
+    | "contact_book"
+    | "discord"
+    | "drive"
+    | "firefox"
+    | "flop_drive"
+    | "folder_closed"
+    | "folder_dark"
+    | "folder_open"
+    | "games"
+    | "gihtub"
+    | "image_editor"
+    | "image_file"
+    | "mail"
+    | "microphone"
+    | "minecraft"
+    | "movies"
+    | "music"
+    | "news"
+    | "notepad"
+    | "paint_alt"
+    | "paint"
+    | "parsec"
+    | "password_manager"
+    | "phone"
+    | "printer"
+    | "program"
+    | "recycle_bin_full"
+    | "recycle_bin"
+    | "script_file"
+    | "search"
+    | "slack"
+    | "sounds"
+    | "spreadsheet_file"
+    | "spreadsheet_program"
+    | "stardew_valley"
+    | "steam"
+    | "sticky_note"
+    | "text_editor"
+    | "text_file_2"
+    | "text_file"
+    | "text_file2"
+    | "this_computer"
+    | "tools"
+    | "video_editor"
+    | "video_file"
+    | "video_movie_editor"
+    | "vlc"
+    | "webpage_file"
+    | "workspace"
+    | "world";
+
+// include some common alias names so older code keeps working
+export type AnyIconName = IconName
     | "computer"
     | "folder"
     | "file"
     | "notepad"
     | "paint"
     | "settings"
-    | "calendar"
     | "volume"
-    | "start";
+    | "start"
+    | "github"
+    | "gihtub";
 
-export function Win95Icon({ name, size = 16, className }: { name: IconName; size?: number; className?: string }) {
-    const common = { width: size, height: size, style: { imageRendering: "pixelated" as const } };
-    switch (name) {
-        case "start":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Start">
-                    <rect x="0" y="0" width="16" height="16" fill="#008080" />
-                    <rect x="1" y="1" width="14" height="14" fill="#00C0C0" />
-                    <rect x="2" y="2" width="12" height="12" fill="#008080" />
-                </svg>
-            );
-        case "calendar":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Calendar">
-                    <rect x="1" y="3" width="14" height="12" fill="#C0C0C0" stroke="#000" />
-                    <rect x="1" y="3" width="14" height="3" fill="#808080" />
-                    <rect x="3" y="1" width="2" height="4" fill="#000" />
-                    <rect x="11" y="1" width="2" height="4" fill="#000" />
-                    <rect x="3" y="7" width="2" height="2" fill="#000" />
-                    <rect x="7" y="7" width="2" height="2" fill="#000" />
-                    <rect x="11" y="7" width="2" height="2" fill="#000" />
-                </svg>
-            );
-        case "volume":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Volume">
-                    <rect x="1" y="6" width="4" height="4" fill="#000" />
-                    <polygon points="5,6 9,3 9,13 5,10" fill="#000" />
-                    <rect x="11" y="5" width="1" height="6" fill="#000" />
-                </svg>
-            );
-        case "computer":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="My Computer">
-                    <rect x="2" y="2" width="12" height="8" fill="#C0C0C0" stroke="#000" />
-                    <rect x="3" y="3" width="10" height="6" fill="#000" />
-                    <rect x="5" y="11" width="6" height="2" fill="#808080" stroke="#000" />
-                </svg>
-            );
-        case "folder":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Folder">
-                    <rect x="1" y="4" width="14" height="10" fill="#C8A000" stroke="#000" />
-                    <rect x="1" y="3" width="6" height="3" fill="#E0C060" stroke="#000" />
-                </svg>
-            );
-        case "file":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="File">
-                    <rect x="3" y="2" width="10" height="12" fill="#FFF" stroke="#000" />
-                    <rect x="4" y="4" width="8" height="1" fill="#000" />
-                    <rect x="4" y="6" width="8" height="1" fill="#000" />
-                </svg>
-            );
-        case "notepad":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Notepad">
-                    <rect x="2" y="2" width="12" height="12" fill="#FFF" stroke="#000" />
-                    <rect x="3" y="3" width="10" height="1" fill="#000" />
-                    <rect x="3" y="5" width="10" height="1" fill="#000" />
-                    <rect x="3" y="7" width="10" height="1" fill="#000" />
-                </svg>
-            );
-        case "paint":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Paint">
-                    <circle cx="6" cy="6" r="3" fill="#C0C0C0" stroke="#000" />
-                    <rect x="9" y="8" width="5" height="2" fill="#804000" stroke="#000" />
-                </svg>
-            );
-        case "settings":
-            return (
-                <svg {...common} viewBox="0 0 16 16" className={className} role="img" aria-label="Settings">
-                    <circle cx="8" cy="8" r="3" fill="#808080" stroke="#000" />
-                    <rect x="7" y="1" width="2" height="4" fill="#000" />
-                    <rect x="7" y="11" width="2" height="4" fill="#000" />
-                </svg>
-            );
-        default:
-            return null;
-    }
+const ICON_MAP: Record<AnyIconName, string> = {
+    three_d_graphics_file: "3d_graphics_file.png",
+    three_d_graphics_program: "3d_graphics_program.png",
+    aseprite_file: "aseprite_file.png",
+    aseprite: "aseprite.png",
+    audio_editor: "audio_editor.png",
+    audio_file: "audio_file.png",
+    audio_music_file: "audio_music_file.png",
+    briefcase: "briefcase.png",
+    calculator: "calculator.png",
+    calendar: "calendar.png",
+    camera: "camera.png",
+    cd_drive: "cd_drive.png",
+    chrome: "chrome.png",
+    clock: "clock.png",
+    contact_book: "contact_book.png",
+    discord: "discord.png",
+    drive: "drive.png",
+    firefox: "firefox.png",
+    flop_drive: "flop_drive.png",
+    folder_closed: "folder_closed.png",
+    folder_dark: "folder_dark.png",
+    folder_open: "folder_open.png",
+    games: "games.png",
+    gihtub: "gihtub.png",
+    image_editor: "image_editor.png",
+    image_file: "image_file.png",
+    mail: "mail.png",
+    microphone: "microphone.png",
+    minecraft: "minecraft.png",
+    movies: "movies.png",
+    music: "music.png",
+    news: "news.png",
+    paint_alt: "paint_alt.png",
+    parsec: "parsec.png",
+    password_manager: "password_manager.png",
+    phone: "phone.png",
+    printer: "printer.png",
+    program: "program.png",
+    recycle_bin_full: "recycle_bin_full.png",
+    recycle_bin: "recycle_bin.png",
+    script_file: "script_file.png",
+    search: "search.png",
+    slack: "slack.png",
+    sounds: "sounds.png",
+    spreadsheet_file: "spreadsheet_file.png",
+    spreadsheet_program: "spreadsheet_program.png",
+    stardew_valley: "stardew_valley.png",
+    steam: "steam.png",
+    sticky_note: "sticky_note.png",
+    text_editor: "text_editor.png",
+    text_file_2: "text_file_2.png",
+    text_file: "text_file.png",
+    text_file2: "text_file2.png",
+    this_computer: "this_computer.png",
+    tools: "tools.png",
+    video_editor: "video_editor.png",
+    video_file: "video_file.png",
+    video_movie_editor: "video_movie_editor.png",
+    vlc: "vlc.png",
+    webpage_file: "webpage_file.png",
+    workspace: "workspace.png",
+    world: "world.png",
+    // aliases
+    computer: "this_computer.png",
+    folder: "folder_closed.png",
+    file: "text_file.png",
+    notepad: "notepad.png",
+    paint: "paint.png",
+    settings: "tools.png",
+    volume: "sounds.png",
+    start: "world.png",
+    github: "gihtub.png",
+};
+
+export function Win95Icon({ name, size = 16, className }: { name: AnyIconName; size?: number; className?: string }) {
+    const src = `/icons_1024x1024/${ICON_MAP[name]}`;
+    return (
+        <span style={{ width: size, height: size, display: "inline-block", lineHeight: 0 }} className={className}>
+            <Image src={src} width={size} height={size} alt={name} style={{ imageRendering: "pixelated" }} />
+        </span>
+    );
 }

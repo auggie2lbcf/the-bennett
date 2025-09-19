@@ -1,21 +1,23 @@
 // components/Desktop.tsx
 "use client";
 import React, {useRef} from "react";
-import {Win95Icon, IconName} from "@/components/Win95Icons";
+import {Win95Icon, AnyIconName} from "@/components/Win95Icons";
 import {useUIState} from "@/hooks/useUIState";
-import {ProjectWindow} from "@/components/ProjectWindow";
+import Win95Window from "@/components/Win95Window";
+import AboutMe from "@/components/AboutMe";
 
-const PROJECTS: Array<{ id: string; title: string; icon: "folder" | "notepad" | "paint" | "file" | "computer"; url: string }> = [
+const PROJECTS: Array<{ id: string; title: string; icon: AnyIconName; url: string; openInNewTab?: boolean }> = [
     {id: "proj-portfolio", title: "Church Website", icon: "folder", url: "https://covenantcommunity.org"},
     {id: "proj-blog", title: "Coffee Website", icon: "notepad", url: "https://itsthevine.com"},
-    {id: "proj-lab", title: "Lab", icon: "paint", url: "https://example.com/lab"},
+    // GitHub blocks embedding via X-Frame-Options; prefer open in new tab
+    {id: "github", title: "GitHub: Auggie2lbcf", icon: "github", url: "https://github.com/auggie2lbcf", openInNewTab: true}
 ];
 
 export function Desktop() {
-    const {projects, openProject} = useUIState();
+    const {projects, openProject, closeProject, aboutVisible, aboutMinimized, setAboutVisible} = useUIState();
     const clickTimers = useRef<Record<string, number | null>>({});
 
-    const handleIconClick = (pid: string, meta: { title: string; icon: IconName; url: string }) => {
+    const handleIconClick = (pid: string, meta: { title: string; icon: AnyIconName; url: string; openInNewTab?: boolean }) => {
         const t = clickTimers.current[pid];
         if (t) {
             clearTimeout(t);
@@ -40,8 +42,15 @@ export function Desktop() {
                     <button
                         key={p.id}
                         className="desktop-icon"
-                        onClick={() => handleIconClick(p.id, {title: p.title, icon: p.icon, url: p.url})}
-                        onDoubleClick={() => openProject(p.id, {title: p.title, icon: p.icon, url: p.url})}
+                        onClick={() => handleIconClick(p.id, {title: p.title, icon: p.icon, url: p.url, openInNewTab: p.openInNewTab})}
+                        onDoubleClick={(e: React.MouseEvent) => {
+                            // Open in a new browser tab if the project prefers it, or user held a modifier / middle-click
+                            if (p.url && (p.openInNewTab || e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)) {
+                                window.open(p.url, "_blank");
+                                return;
+                            }
+                            openProject(p.id, { title: p.title, icon: p.icon, url: p.url });
+                        }}
                         style={{
                             background: "transparent",
                             border: "none",
@@ -57,14 +66,29 @@ export function Desktop() {
                 ))}
             </div>
 
-            {projects.map((p) => (
-                <ProjectWindow key={p.id} id={p.id}>
-                    <div style={{lineHeight: 1.4}}>
-                        <strong>{p.title}</strong>
-                        <p>This is the {p.title} app window. Put your project UI here.</p>
-                    </div>
-                </ProjectWindow>
+            {projects.filter((p) => !p.minimized).map((p) => (
+                <Win95Window
+                    key={p.id}
+                    id={p.id}
+                    title={p.title}
+                    icon={p.icon}
+                    url={p.url}
+                    initial={{ x: p.left ?? 120, y: p.top ?? 96, width: p.width ?? 760, height: p.height ?? 480 }}
+                    onClose={() => closeProject(p.id)}
+                >
+                    {!p.url && (
+                        <div style={{ padding: 12 }}>
+                            <strong>{p.title}</strong>
+                            <p style={{ marginTop: 8 }}>This is a mocked app window.</p>
+                        </div>
+                    )}
+                </Win95Window>
             ))}
+
+            {/* About window (separate from projects) */}
+            {aboutVisible && !aboutMinimized && (
+                <AboutMe id="about-me" onClose={() => setAboutVisible(false)} />
+            )}
         </div>
     );
 }

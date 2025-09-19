@@ -12,28 +12,58 @@ export function useDrag(enabled: boolean, initial = { x: 120, y: 80 }) {
     const dragging = useRef(false);
     const offset = useRef({ x: 0, y: 0 });
 
-    const onMouseDown = (e: React.MouseEvent) => {
+    // batch updates with rAF for smoother performance
+    const pending = useRef<{ x?: number; y?: number } | null>(null);
+    const raf = useRef<number | null>(null);
+
+    const flush = () => {
+        if (pending.current) {
+            // capture values locally to avoid pending.current becoming null inside the updater
+            const next = { x: pending.current.x, y: pending.current.y };
+            setPos((p) => ({ x: next.x ?? p.x, y: next.y ?? p.y }));
+            pending.current = null;
+        }
+        if (raf.current) {
+            cancelAnimationFrame(raf.current);
+            raf.current = null;
+        }
+    };
+
+    const onPointerDown = (e: React.PointerEvent) => {
         if (!enabled) return;
+        (e.target as Element).setPointerCapture?.(e.pointerId);
         dragging.current = true;
         offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
         e.preventDefault();
     };
 
     useEffect(() => {
-        const onMove = (e: MouseEvent) => {
+        const onMove = (e: PointerEvent) => {
             if (!dragging.current) return;
-            setPos({ x: e.clientX - offset.current.x, y: e.clientY - offset.current.y });
+            const nx = e.clientX - offset.current.x;
+            const ny = e.clientY - offset.current.y;
+            pending.current = { x: nx, y: ny };
+            if (!raf.current) {
+                raf.current = requestAnimationFrame(() => {
+                    flush();
+                });
+            }
         };
         const onUp = () => {
             dragging.current = false;
+            flush();
         };
-        window.addEventListener("mousemove", onMove);
-        window.addEventListener("mouseup", onUp);
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
         return () => {
-            window.removeEventListener("mousemove", onMove);
-            window.removeEventListener("mouseup", onUp);
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            if (raf.current) cancelAnimationFrame(raf.current);
         };
     }, []);
 
-    return { pos, setPos, onMouseDown };
+    // keep backward-compatible name
+    const onMouseDown = (e: React.MouseEvent) => onPointerDown(e as unknown as React.PointerEvent);
+
+    return { pos, setPos, onPointerDown, onMouseDown };
 }
